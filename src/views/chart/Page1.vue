@@ -1,7 +1,5 @@
 <template>
-  <div class="hello">
-    <div id="container"></div>
-  </div>
+  <div id="chart-container"></div>
 </template>
 
 <script>
@@ -15,103 +13,98 @@ HighchartsDrilldown(Highcharts);
 Highcharts3D(Highcharts);
 
 export default {
-  name: "HelloWorld",
-  props: {
-    msg: String
+  data() {
+    return {
+      timer: null,
+      chart: null
+    }
   },
   mounted() {
     // dom已加载
+    console.log('mounted')
     this.moreChart();
+    // 启动定时器
+    console.log('启动定时器');
+    this.timer = setInterval(this.moreChart, 10000);
   },
+  beforeRouteLeave(to, from, next){
+    console.log('beforeRouteLeave');
+    if (this.timer !== null) {
+      // 清除定时器
+      console.log('清除定时器');
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    next();
+  },
+    
   methods: {
     moreChart() {
-      if (this.chart) {
-        this.chart.destroy();
-      }
-      // 初始化 Highcharts 图表
-      this.chart = new Highcharts.Chart("container", {
-        title: {
-          text: "2010 ~ 2016 年太阳能行业就业人员发展情况"
-        },
-        subtitle: {
-          text: "数据来源：thesolarfoundation.com"
-        },
-        yAxis: {
+      if (this.chart === null) {
+        // 初始化 Highcharts 图表
+        console.log('初始化');
+        this.chart = new Highcharts.Chart("chart-container", {
           title: {
-            text: "就业人数"
-          }
-        },
-        legend: {
-          layout: "vertical",
-          align: "right",
-          verticalAlign: "middle"
-        },
-        plotOptions: {
-          series: {
-            label: {
-              connectorAllowed: false
-            },
-            pointStart: 2010
-          }
-        },
-        series: [
-          {
-            name: "安装，实施人员",
-            data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+            text: "2010 ~ 2016 年太阳能行业就业人员发展情况"
           },
-          {
-            name: "工人",
-            data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+          subtitle: {
+            text: "数据来源：thesolarfoundation.com"
           },
-          {
-            name: "销售",
-            data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+          yAxis: {
+            title: {
+              text: "就业人数"
+            }
           },
-          {
-            name: "项目开发",
-            data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
+          legend: {
+            layout: "vertical",
+            align: "right",
+            verticalAlign: "middle"
           },
-          {
-            name: "其他",
-            data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
-          }
-        ],
-        responsive: {
-          rules: [
-            {
-              condition: {
-                maxWidth: 500
+          plotOptions: {
+            series: {
+              label: {
+                connectorAllowed: false
               },
-              chartOptions: {
-                legend: {
-                  layout: "horizontal",
-                  align: "center",
-                  verticalAlign: "bottom"
+              pointStart: 2010
+            }
+          },
+          series: [
+            {
+              name: "实施人员",
+              data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+            }
+          ],
+          responsive: {
+            rules: [
+              {
+                condition: {
+                  maxWidth: 500
+                },
+                chartOptions: {
+                  legend: {
+                    layout: "horizontal",
+                    align: "center",
+                    verticalAlign: "bottom"
+                  }
                 }
               }
-            }
-          ]
+            ]
+          }
+        });
+      } else {
+        console.log('更新');
+        let newData = [];
+        for (let i=0; i<8; i++) {
+          newData.push(Math.ceil(Math.random()*100000));
         }
-      });
+        this.chart.series[0].setData(newData)
+      }
+      
     }
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit css to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+<style lang="scss" scoped>
 </style>
