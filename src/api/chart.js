@@ -14,3 +14,11 @@ export function saveData(data) {
     params: data
   })
 }
+
+export function getSavedData(data) {
+  return request({
+    url: '/api/table2/',
+    method: 'get',
+    params: data
+  })
+}
