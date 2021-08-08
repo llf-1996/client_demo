@@ -15,6 +15,7 @@
 </template>
 
 <script>
+// import { ElMessage } from 'element-plus'
 import { refreshData, saveData } from '@/api/chart.js'
 import Highcharts from "highcharts/highstock";
 import HighchartsMore from "highcharts/highcharts-more";
@@ -120,7 +121,11 @@ export default {
       console.log(this.id)
       saveData({id: this.id})
         .then(res => {
-          console.log(res)
+          this.$message({
+                          showClose: true,
+                          message: '保存成功！',
+                          type: 'success'
+                        })
         })
         .catch();
     }
