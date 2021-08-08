@@ -1,5 +1,7 @@
 # client_demo
 
+> vue3、vue-router、axios、element plus、vue-cli、highcharts
+
 ## Project setup
 ```
 npm install
