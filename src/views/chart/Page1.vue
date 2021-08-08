@@ -1,8 +1,21 @@
 <template>
-  <div id="chart-container"></div>
+  
+   <el-row :gutter="10" justify="end">
+    <el-col :xs="2" :md="2" :lg="2">
+      <div>
+        <el-button type="primary" @click="save">保存</el-button>
+      </div>
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="24">
+      <div id="chart-container"></div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
+import { refreshData, saveData } from '@/api/chart.js'
 import Highcharts from "highcharts/highstock";
 import HighchartsMore from "highcharts/highcharts-more";
 import HighchartsDrilldown from "highcharts/modules/drilldown";
@@ -16,7 +29,8 @@ export default {
   data() {
     return {
       timer: null,
-      chart: null
+      chart: null,
+      id: null
     }
   },
   mounted() {
@@ -40,68 +54,78 @@ export default {
     
   methods: {
     moreChart() {
-      if (this.chart === null) {
-        // 初始化 Highcharts 图表
-        console.log('初始化');
-        this.chart = new Highcharts.Chart("chart-container", {
-          title: {
-            text: "2010 ~ 2016 年太阳能行业就业人员发展情况"
-          },
-          subtitle: {
-            text: "数据来源：thesolarfoundation.com"
-          },
-          yAxis: {
-            title: {
-              text: "就业人数"
-            }
-          },
-          legend: {
-            layout: "vertical",
-            align: "right",
-            verticalAlign: "middle"
-          },
-          plotOptions: {
-            series: {
-              label: {
-                connectorAllowed: false
+      refreshData()
+        .then(res => {
+          let newData = res.data.data;
+          this.id = res.data.id;
+          if (this.chart === null) {
+            // 初始化 Highcharts 图表
+            console.log('初始化');
+            this.chart = new Highcharts.Chart("chart-container", {
+              title: {
+                text: "2010 ~ 2016 年太阳能行业就业人员发展情况"
               },
-              pointStart: 2010
-            }
-          },
-          series: [
-            {
-              name: "实施人员",
-              data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
-            }
-          ],
-          responsive: {
-            rules: [
-              {
-                condition: {
-                  maxWidth: 500
-                },
-                chartOptions: {
-                  legend: {
-                    layout: "horizontal",
-                    align: "center",
-                    verticalAlign: "bottom"
-                  }
+              subtitle: {
+                text: "数据来源：thesolarfoundation.com"
+              },
+              yAxis: {
+                title: {
+                  text: "就业人数"
                 }
+              },
+              legend: {
+                layout: "vertical",
+                align: "right",
+                verticalAlign: "middle"
+              },
+              plotOptions: {
+                series: {
+                  label: {
+                    connectorAllowed: false
+                  },
+                  pointStart: 2010
+                }
+              },
+              series: [
+                {
+                  name: "实施人员",
+                  data: newData
+                }
+              ],
+              responsive: {
+                rules: [
+                  {
+                    condition: {
+                      maxWidth: 500
+                    },
+                    chartOptions: {
+                      legend: {
+                        layout: "horizontal",
+                        align: "center",
+                        verticalAlign: "bottom"
+                      }
+                    }
+                  }
+                ]
               }
-            ]
+            });
+          } else {
+            console.log('更新');
+            this.chart.series[0].setData(newData)
           }
-        });
-      } else {
-        console.log('更新');
-        let newData = [];
-        for (let i=0; i<8; i++) {
-          newData.push(Math.ceil(Math.random()*100000));
-        }
-        this.chart.series[0].setData(newData)
-      }
-      
+        })
+        .catch();
+    },
+    save() {
+      console.log(this.id)
+      saveData({id: this.id})
+        .then(res => {
+          console.log(res)
+        })
+        .catch();
     }
-  }
+  },
+  computed: {}
 };
 </script>
 
